@@ -29,7 +29,32 @@
             </div>
         </nav>
     </header>
-    <div class="container">
+    <div id="leftMenu">
+        <ul class="list-group">
+            <a class="list-group-item list-group-item-action list-group-item-primary" href="/">
+                Дневник искателя @User.Identity.Name
+            </a>
+            <a class="list-group-item list-group-item-action list-group-item-primary" href="/">
+                Мои сопартийцы
+            </a>
+            <a class="list-group-item list-group-item-action list-group-item-primary" href="/">
+                Я Владыка этих подземелий
+            </a>
+            <a class="list-group-item list-group-item-action list-group-item-primary" href="/">
+                Участник этих подземелий
+            </a>
+
+            @*<a class="list-group-item list-group-item-action list-group-item-primary"
+                   data-bs-target="#modalFormToFillUserInformation"
+                   data-bs-toggle="modal"
+                   id="btn1"
+                   th:data-id-info="${ownerUser.id}"
+                   th:if="${#request.requestURI} == @{/user/{nickName}(nickName=${ownerUser.nickName})}">
+                    Редактировать данные с дневника
+                </a>*@
+        </ul>
+    </div>
+    <div class="container" id="mainContent">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>

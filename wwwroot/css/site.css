@@ -69,3 +69,17 @@ body {
   white-space: nowrap;
   line-height: 60px; /* Vertically center the text there */
 }
+
+#leftMenu {
+    width: 200px;
+    float: left;
+    margin: 10px;
+    padding: 5px;
+}
+
+#mainContent {
+    word-break: break-word;
+    margin: 10px 220px 50px !important;
+    align-content: center;
+    padding: 5px;
+}

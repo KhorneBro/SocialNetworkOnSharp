@@ -1,14 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SocialNetworkOnSharp.Models;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace SocialNetworkOnSharp.Controllers
 {
+    [Authorize(Roles = "user")]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
