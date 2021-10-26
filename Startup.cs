@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SocialNetworkOnSharp.Models;
+using SocialNetworkOnSharp.Services;
 
 namespace SocialNetworkOnSharp
 {
@@ -21,7 +22,10 @@ namespace SocialNetworkOnSharp
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddTransient<UserService>();
             services.AddControllersWithViews();
+            services.AddControllers();
+            services.AddRazorPages();
             services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(Configuration.GetConnectionString("SocialNetworkOnSharpContextConnection")));
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(
             options =>
@@ -58,6 +62,8 @@ namespace SocialNetworkOnSharp
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapControllers();
+                endpoints.MapRazorPages();
             });
         }
     }

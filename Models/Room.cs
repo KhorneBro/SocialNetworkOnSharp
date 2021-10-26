@@ -1,0 +1,18 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace SocialNetworkOnSharp.Models
+{
+    public class Room
+    {
+        public int Id { get; set; }
+        public string Owner { get; set; }
+        public string RoomName { get; set; }
+        public string ShortDescription { get; set; }
+        public string FullDescription { get; set; }
+        public List<User> Users { get; set; } = new List<User>();
+        public List<TheCreature> TheCreatures { get; set; } = new List<TheCreature>();
+    }
+}

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SocialNetworkOnSharp.Models;
+using SocialNetworkOnSharp.Services;
 using System.Diagnostics;
 
 namespace SocialNetworkOnSharp.Controllers
@@ -10,10 +11,11 @@ namespace SocialNetworkOnSharp.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private UserService userService;
 
         public HomeController(ILogger<HomeController> logger)
         {
-            _logger = logger;
+            _logger = logger;                     
         }
 
         public IActionResult Index()
@@ -31,5 +33,7 @@ namespace SocialNetworkOnSharp.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+
+        
     }
 }
