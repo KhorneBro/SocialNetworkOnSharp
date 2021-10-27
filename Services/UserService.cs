@@ -20,6 +20,7 @@ namespace SocialNetworkOnSharp.Services
         internal List<User> Users() => applicationContext.Users.ToList();
         internal async Task<User> FindByidUserAsync(int id) => await Task.Run(() => applicationContext.Users.First(user => user.Id == id));
         internal async Task<User> FindByidNickNameAsync(string nickName) => await Task.Run(() => applicationContext.Users.First(user => user.NickName == nickName));
+        internal User FindByidNickName(string nickName) => applicationContext.Users.First(user => user.NickName == nickName);
         //internal async Task AddInfoToUserAsync(AddInfoUserModel addInfoUserModel)
         //{
 

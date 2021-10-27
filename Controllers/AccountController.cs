@@ -41,7 +41,7 @@ namespace SocialNetworkOnSharp.Controllers
                     await applicationContext.SaveChangesAsync();
                     await Authenticate(user);
 
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("Index", "Home", user.NickName);
                 }
                 else
                 {
@@ -90,7 +90,7 @@ namespace SocialNetworkOnSharp.Controllers
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            return RedirectToAction("Login", "Account");
+            return RedirectToAction("Login");
         }
     }
 }

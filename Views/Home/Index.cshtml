@@ -1,11 +1,90 @@
-﻿@{
+﻿@model SocialNetworkOnSharp.ViewsModel.MainPageModel
+@{
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<!--Main Content-->
+<div>
+    <figure class="figureAvatar">
+        @if (!string.IsNullOrWhiteSpace(@Model?.User.Avatar))
+        {
+            <button type="button" class="border-0" data-bs-target="#avatarModal" data-bs-toggle="modal">
+                <img class="avatarImg img-fluid img-thumbnail"
+                     src="@Url.Content(Model.User.Avatar)" />
+            </button>
+            <button type="button" data-toggle="modal" data-target="#avatarModal">launch</button>
+        }
+        else
+        {
+            <button type="button" class="border-0" data-bs-target="#avatarModal" data-bs-toggle="modal">
+
+                <img class="avatarImg img-fluid img-thumbnail"
+                     src="~/Avatars/avatar_alt.png" />
+            </button>
+        }
+    </figure>
     <div>
-        User<br />
+        @if (Model.User.UseMyHistory)
+        {
+            <div>@Model.User.MyHistory</div>
+        }
+        else
+        {
+            <div>
+                random History
+            </div>
+        }
     </div>
+
+    <!--Main Content-->
+
+    <div aria-hidden="true"
+         class="modal fade avatarModal "
+         id="avatarModal"
+         tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">Выберете Аватар</h4>
+                    <button class="close" data-dismiss="modal" type="button">&times;</button>
+                </div>
+
+                <!-- Modal body -->
+                <div class="modal-body">
+                    <div class="avatarModalSrc">
+                        <img alt="" id="modalSrcAvatar" src="">
+                    </div>
+
+                    @using (Html.BeginForm("AddAvatar", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                    {
+                        <div class="validation" asp-validation-summary="ModelOnly"></div>
+                        <div>
+                            <div class="form-group mb-3 mt-3">
+                                @Html.HiddenFor(rm => rm.User.Id)
+                            </div>
+                            <div class="form-group mb-3 mt-3">
+                                @Html.LabelFor(rm => rm.AddAvatarpicture, "Добавить Аватар")
+                                @Html.EditorFor(rm => rm.AddAvatarpicture)
+                                @*<input type="file" name="AddAvatarpicture" required />*@
+                                @Html.ValidationMessageFor(rm => rm.AddAvatarpicture)
+                            </div>
+                        </div>
+
+                        <!-- Modal footer -->
+                        <div class="modal-footer">
+                            <div>
+                                <button class="btn btn-danger" data-dismiss="modal" type="button">
+                                    Закрыть
+                                </button>
+                                <input type="submit" value="Загрузка" class="btn btn-primary" />
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
