@@ -129,3 +129,13 @@ body {
     margin-left: 0;
     padding-left: 0;
 }
+
+button.outline {
+    border: 0 !important;
+}
+
+    button.outline:active,
+    button.outline:focus {
+        border: 0 !important;
+        outline: none !important;
+    }

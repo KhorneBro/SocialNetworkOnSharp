@@ -10,29 +10,41 @@
 <body>
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="collapse navbar-collapse">
+                <ul class="nav navbar-nav mr-auto">
+                    &ensp;
+                    <li class="navbar-btn nav-item">
+                        <form action="/Home/FindFriend" class="d-flex" method="get">
+                            <input aria-label="Search" autocomplete="true" class="form-control me-1"
+                                   id="nickname" name="nickname" placeholder="Поиск по никнейму"
+                                   type="search">
+                            <button class="btn btn-outline-success" type="submit">Поиск</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
             <div class="container">
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">SocialNetworkOnSharp</a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
+                    <p>ryjgrf</p>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
                     </ul>
                 </div>
-                @if (User.Identity.IsAuthenticated)
-                {
-                    <form method="post" asp-controller="Account" asp-action="Logout">
-                        <input class="btn btn-outline-primary" type="submit" value="Exit" />
-                    </form>
-                }             
+
             </div>
+            @if (User.Identity.IsAuthenticated)
+            {
+                <form method="post" asp-controller="Account" asp-action="Logout">
+                    <input class="btn btn-outline-primary" type="submit" value="Выйти" />
+                </form>
+            }
         </nav>
     </header>
     <div id="leftMenu">
@@ -49,15 +61,6 @@
             <a class="list-group-item list-group-item-action list-group-item-primary" href="/">
                 Участник этих подземелий
             </a>
-
-            @*<a class="list-group-item list-group-item-action list-group-item-primary"
-                   data-bs-target="#modalFormToFillUserInformation"
-                   data-bs-toggle="modal"
-                   id="btn1"
-                   th:data-id-info="${ownerUser.id}"
-                   th:if="${#request.requestURI} == @{/user/{nickName}(nickName=${ownerUser.nickName})}">
-                    Редактировать данные с дневника
-                </a>*@
         </ul>
     </div>
     <div class="container" id="mainContent">
@@ -68,7 +71,7 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2021 - SocialNetworkOnSharp - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            &copy; 2021 - SocialNetworkOnSharp
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

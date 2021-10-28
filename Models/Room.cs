@@ -12,7 +12,7 @@ namespace SocialNetworkOnSharp.Models
         public string RoomName { get; set; }
         public string ShortDescription { get; set; }
         public string FullDescription { get; set; }
-        public List<User> Users { get; set; } = new List<User>();
+        public List<Participant> Users { get; set; } = new List<Participant>();
         public List<TheCreature> TheCreatures { get; set; } = new List<TheCreature>();
     }
 }

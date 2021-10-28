@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace SocialNetworkOnSharp.Models
 {
-    public class User
+    public class Participant
     {
         public int Id { get; set; }
         public string Login { get; set; }

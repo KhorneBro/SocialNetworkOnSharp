@@ -16,12 +16,12 @@ namespace SocialNetworkOnSharp.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<User>()
+            modelBuilder.Entity<Participant>()
                 .Property(u => u.Avatar)
                 .HasDefaultValue("");
         }
 
-        public DbSet<User> Users { get; set; }
+        public DbSet<Participant> Users { get; set; }
         public DbSet<Room> Rooms { get; set; }
         public DbSet<TheCreature> TheCreatures { get; set; }
         public DbSet<Friend> Friends { get; set; }

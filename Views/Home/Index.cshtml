@@ -8,15 +8,14 @@
     <figure class="figureAvatar">
         @if (!string.IsNullOrWhiteSpace(@Model?.User.Avatar))
         {
-            <button type="button" class="border-0" data-bs-target="#avatarModal" data-bs-toggle="modal">
+            <button type="button" class="border-0 outline" data-target="#avatarModal" data-toggle="modal">
                 <img class="avatarImg img-fluid img-thumbnail"
                      src="@Url.Content(Model.User.Avatar)" />
             </button>
-            <button type="button" data-toggle="modal" data-target="#avatarModal">launch</button>
         }
         else
         {
-            <button type="button" class="border-0" data-bs-target="#avatarModal" data-bs-toggle="modal">
+            <button type="button" class="border-0 outline" data-target="#avatarModal" data-toggle="modal">
 
                 <img class="avatarImg img-fluid img-thumbnail"
                      src="~/Avatars/avatar_alt.png" />
@@ -67,7 +66,6 @@
                             <div class="form-group mb-3 mt-3">
                                 @Html.LabelFor(rm => rm.AddAvatarpicture, "Добавить Аватар")
                                 @Html.EditorFor(rm => rm.AddAvatarpicture)
-                                @*<input type="file" name="AddAvatarpicture" required />*@
                                 @Html.ValidationMessageFor(rm => rm.AddAvatarpicture)
                             </div>
                         </div>

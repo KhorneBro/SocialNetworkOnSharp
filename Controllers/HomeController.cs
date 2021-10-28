@@ -1,18 +1,17 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using SocialNetworkOnSharp.Models;
 using SocialNetworkOnSharp.Services;
 using SocialNetworkOnSharp.ViewsModel;
-using System;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Security.Principal;
-using System.Threading.Tasks;
 
 namespace SocialNetworkOnSharp.Controllers
 {
@@ -41,60 +40,65 @@ namespace SocialNetworkOnSharp.Controllers
 
         public IActionResult Index()
         {
-            User user = userService.FindByidNickName(HttpContext.User.Identity.Name.ToString());
-            MainPageModel pageModel = new MainPageModel(user);
-
+            MainPageModel pageModel = new MainPageModel();
+            pageModel.User = userService.FindByLogin(User.Identity.Name.ToString());
             return View(pageModel);
         }
 
-        public IActionResult Privacy()
-        {
-            return View();
-        }
-
         [HttpPost]
-        public async Task<IActionResult> AddAvatar([FormBody] MainPageModel mainPageModel)
+        public async Task<IActionResult> AddAvatar(MainPageModel mainPageModel)
         {
-            var ext = Path.GetExtension(mainPageModel.AddAvatarpicture.FileName).ToLowerInvariant();
             string[] permittedExtensions = { ".jpg", ".png", ".jpeg" };
 
 
-            if (mainPageModel.AddAvatarpicture == null)
+            if (mainPageModel.AddAvatarpicture is null)
             {
-                ModelState.AddModelError("", "Файл не передан");
+                ModelState.AddModelError("AddAvatarpicture", "Файл не передан");
                 return RedirectToAction("Index");
             }
             else if (mainPageModel.AddAvatarpicture.Length > 31457280)
             {
-                ModelState.AddModelError("", "Файл не должен превышать размер 50Мб");
+                ModelState.AddModelError("AddAvatarpicture", "Файл не должен превышать размер 50Мб");
                 return RedirectToAction("Index");
             }
-            else if (string.IsNullOrEmpty(ext) || !permittedExtensions.Contains(ext))
+            else if (string.IsNullOrEmpty(Path.GetExtension(mainPageModel.AddAvatarpicture.FileName).ToLowerInvariant()) ||
+                !permittedExtensions.Contains(Path.GetExtension(mainPageModel.AddAvatarpicture.FileName).ToLowerInvariant()))
             {
-                ModelState.AddModelError("", "Не верный формат файла");
+                ModelState.AddModelError("AddAvatarpicture", "Не верный формат файла");
                 return RedirectToAction("Index");
             }
             else
             {
-                User user = applicationContext.Users.Find(mainPageModel.User.Id);
+                Participant user = applicationContext.Users.Find(mainPageModel.User.Id);
                 if (!string.IsNullOrEmpty(user.Avatar))
                 {
                     FileInfo fileInfo = new FileInfo(webHostEnvironment.WebRootPath + user.Avatar);
                     if (fileInfo.Exists)
+                    {
                         fileInfo.Delete();
+                    }
                     else
-                        ModelState.AddModelError("", "Файл принадлежит пользователю, но удален из хранилища");
+                    {
+                        ModelState.AddModelError("AddAvatarpicture", "Файл принадлежит пользователю, но удален из хранилища");
+                    }
                     user.Avatar = "";
-                    await applicationContext.SaveChangesAsync();
-                    return RedirectToAction("Index");
                 }
-                string path = "/Avatars/" + Path.GetRandomFileName() + ext;
+                string path = "/Avatars/" + Path.GetRandomFileName() + Path.GetExtension(mainPageModel.AddAvatarpicture.FileName).ToLowerInvariant();
                 using (var filestream = new FileStream(webHostEnvironment.WebRootPath + path, FileMode.Create))
+                {
                     await mainPageModel.AddAvatarpicture.CopyToAsync(filestream);
+                }
+
                 user.Avatar = path;
                 await applicationContext.SaveChangesAsync();
                 return RedirectToAction("Index");
             }
+        }
+
+        [HttpGet]
+        public IActionResult FindFriend(string nickname)
+        {
+            return View("dds", userService.ParticipantsSearchFriendList(nickname, userService.FindByLogin(User.Identity.Name.ToString()).NickName));
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

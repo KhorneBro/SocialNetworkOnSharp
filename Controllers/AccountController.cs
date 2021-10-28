@@ -27,21 +27,21 @@ namespace SocialNetworkOnSharp.Controllers
         {
             if (ModelState.IsValid)
             {
-                User user = await applicationContext.Users.FirstOrDefaultAsync(u => u.Login == registerModel.Login);
+                Participant user = await applicationContext.Users.FirstOrDefaultAsync(u => u.Login == registerModel.Login);
                 if (user == null)
                 {
-                    user = new User
+                    user = new Participant
                     {
-                        Login = registerModel.Login,
-                        Password = registerModel.Password,
+                        Login = registerModel.Login.Trim(),
+                        Password = registerModel.Password.Trim(),
                         Role = "user",
-                        NickName = registerModel.NickName
+                        NickName = registerModel.NickName.Trim()
                     };
                     applicationContext.Users.Add(user);
                     await applicationContext.SaveChangesAsync();
                     await Authenticate(user);
 
-                    return RedirectToAction("Index", "Home", user.NickName);
+                    return RedirectToAction("Login");
                 }
                 else
                 {
@@ -63,7 +63,7 @@ namespace SocialNetworkOnSharp.Controllers
         {
             if (ModelState.IsValid)
             {
-                User user = await applicationContext.Users.FirstOrDefaultAsync(u => u.Login == loginModel.Login && u.Password == loginModel.Password);
+                Participant user = await applicationContext.Users.FirstOrDefaultAsync(u => u.Login == loginModel.Login && u.Password == loginModel.Password);
                 if (user != null)
                 {
                     await Authenticate(user);
@@ -74,7 +74,7 @@ namespace SocialNetworkOnSharp.Controllers
             return View(loginModel);
         }
 
-        private async Task Authenticate(User user)
+        private async Task Authenticate(Participant user)
         {
             var claims = new List<Claim>
             {
