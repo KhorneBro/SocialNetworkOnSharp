@@ -1,4 +1,3 @@
-using System.Security.Principal;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -24,6 +23,7 @@ namespace SocialNetworkOnSharp
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddTransient<UserService>();
+            services.AddTransient<FriendListInteractionService>();
             services.AddControllersWithViews();
             services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(Configuration.GetConnectionString("SocialNetworkOnSharpContextConnection")));
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(
@@ -60,7 +60,7 @@ namespace SocialNetworkOnSharp
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");                
+                    pattern: "{controller=Home}/{action=Index}/{id?}");
             });
         }
     }

@@ -1,0 +1,74 @@
+﻿@model IEnumerable<Participant>
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+
+<h3>List</h3>
+<ul>
+    @foreach (var user in Model.ToList())
+    {
+        <li>@user.NickName</li>
+    }
+</ul>
+
+<ul id="ulSearchFindUser">
+    <li id="ilSearchFindUser">
+        <form action="/Home/FindFriend" class="d-flex m-1 p-1" method="get">
+            <input aria-label="Search" autocomplete="true" class="form-control  m-1 p-1"
+                   id="nickname" name="nickname" placeholder="Поиск по никнейму"
+                   type="search">
+            <button class="btn btn-outline-success" type="submit">Поиск</button>
+        </form>
+    </li>
+</ul>
+
+@if (Model.ToList().Count == 0)
+{
+
+
+    <ul>
+        <div>
+            Не найдено пользователей
+        </div>
+    </ul>
+}
+else
+{
+    @foreach (var user in Model.ToList())
+    {
+        <ul id="findUsersList">
+            <li class="list-group-item d-flex justify-content-between align-items-start friend-item-list">
+                <div class="ms-2 me-auto pb-2" th:with="ownerUser=${ownerUser}">
+                    <div class="fw-bold m-2">@user.NickName</div>
+                    <button class="btn btn-outline-danger"
+                            onclick="cancelAddFriendRequest(@user.Id)"
+                            type="button">
+                        Отменить заявку
+                    </button>
+                    <button class="btn btn-outline-success"
+                            onclick="acceptAddFriendRequest(@user.Id)"
+                            type="button">
+                        Принять заявку
+                    </button>
+                    <button class="btn btn-outline-danger"
+                            onclick="declineAddFriendRequest(@user.Id)"
+                            type="button">
+                        Отклонить заявку
+                    </button>
+                    <button class="btn btn-outline-primary"
+                            onclick="addFriend(@user.Id)"
+                            type="button">
+                        Отправить заявку
+                    </button>
+                </div>
+                <a href="~/Home/Index?id=@user.Id">
+                    <img class="avatarImgFriendList" src="@Url.Content(user.Avatar)" />
+                </a>
+            </li>
+        </ul>
+    }
+}
+
+
+

@@ -18,7 +18,7 @@ namespace SocialNetworkOnSharp.Models
         {
             modelBuilder.Entity<Participant>()
                 .Property(u => u.Avatar)
-                .HasDefaultValue("");
+                .HasDefaultValue("/Avatars/avatar_alt.png");
         }
 
         public DbSet<Participant> Users { get; set; }

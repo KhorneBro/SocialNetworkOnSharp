@@ -19,14 +19,11 @@ namespace SocialNetworkOnSharp.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private UserService userService;
-        private IWebHostEnvironment webHostEnvironment;
-        private ApplicationContext applicationContext;
-
-
-
-
-        public HomeController(ILogger<HomeController> logger,
+        private readonly UserService userService;
+        private readonly IWebHostEnvironment webHostEnvironment;
+        private readonly ApplicationContext applicationContext;
+        public HomeController(
+               ILogger<HomeController> logger,
                UserService userService,
                IWebHostEnvironment webHostEnvironment,
                ApplicationContext applicationContext)
@@ -38,15 +35,23 @@ namespace SocialNetworkOnSharp.Controllers
 
         }
 
-        public IActionResult Index()
+        public ActionResult Index(int? id)
         {
             MainPageModel pageModel = new MainPageModel();
-            pageModel.User = userService.FindByLogin(User.Identity.Name.ToString());
+            if (id == null)
+            {
+                pageModel.User = userService.FindByLogin(User.Identity.Name.ToString());
+            }
+            else
+            {
+                pageModel.User = applicationContext.Users.FirstOrDefault(u => u.Id == id);
+            }
+
             return View(pageModel);
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddAvatar(MainPageModel mainPageModel)
+        public async Task<ActionResult> AddAvatar(MainPageModel mainPageModel)
         {
             string[] permittedExtensions = { ".jpg", ".png", ".jpeg" };
 
@@ -96,13 +101,23 @@ namespace SocialNetworkOnSharp.Controllers
         }
 
         [HttpGet]
-        public IActionResult FindFriend(string nickname)
+        public ActionResult FindFriend(string nickname)
         {
-            return View("dds", userService.ParticipantsSearchFriendList(nickname, userService.FindByLogin(User.Identity.Name.ToString()).NickName));
+            return View("FindFriend", userService.ParticipantsSearchFriendList(nickname, userService.FindByLogin(User.Identity.Name.ToString()).NickName));
+        }
+
+        [HttpGet]
+        public ActionResult FriendList()
+        {
+            Dictionary<string, List<Participant>> threeTypesFriendlist = userService.FriendList(User.Identity.Name.ToString());
+            ViewBag.FriendList = threeTypesFriendlist["FriendList"];
+            ViewBag.RequestToMe = threeTypesFriendlist["RequestToMe"];
+            ViewBag.RequestFromMe = threeTypesFriendlist["RequestFromMe"];
+            return View();
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
+        public ActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }

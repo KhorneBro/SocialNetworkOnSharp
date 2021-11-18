@@ -28,20 +28,28 @@ namespace SocialNetworkOnSharp.Controllers
             if (ModelState.IsValid)
             {
                 Participant user = await applicationContext.Users.FirstOrDefaultAsync(u => u.Login == registerModel.Login);
+                Participant userNick = await applicationContext.Users.FirstOrDefaultAsync(u => u.NickName == registerModel.NickName);
                 if (user == null)
                 {
-                    user = new Participant
+                    if (userNick == null)
                     {
-                        Login = registerModel.Login.Trim(),
-                        Password = registerModel.Password.Trim(),
-                        Role = "user",
-                        NickName = registerModel.NickName.Trim()
-                    };
-                    applicationContext.Users.Add(user);
-                    await applicationContext.SaveChangesAsync();
-                    await Authenticate(user);
+                        user = new Participant
+                        {
+                            Login = registerModel.Login.Trim(),
+                            Password = registerModel.Password.Trim(),
+                            Role = "user",
+                            NickName = registerModel.NickName.Trim()
+                        };
+                        applicationContext.Users.Add(user);
+                        await applicationContext.SaveChangesAsync();
+                        await Authenticate(user);
 
-                    return RedirectToAction("Login");
+                        return RedirectToAction("Login");
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("", "Этот никнейм занят");
+                    }
                 }
                 else
                 {

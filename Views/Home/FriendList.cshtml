@@ -1,0 +1,140 @@
+﻿
+@{
+    ViewData["Title"] = "Friends";
+    var friends = ViewBag.FriendList;
+}
+<div>
+    <ul class="nav nav-pills" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button aria-controls="friends" aria-selected="true" class="nav-link active" data-bs-target="#friends"
+                    data-bs-toggle="tab" id="friends-tab" role="tab" type="button">
+                Друзья
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button aria-controls="requestToMe" aria-selected="false" class="nav-link "
+                    data-bs-target="#requestToMe"
+                    data-bs-toggle="tab" id="requestToMe-tab" role="tab" type="button">
+                Входящие запросы в друзья
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button aria-controls="requestFromMe" aria-selected="false" class="nav-link "
+                    data-bs-target="#requestFromMe"
+                    data-bs-toggle="tab" id="requestFromMe-tab" role="tab" type="button">
+                Исходящие запросы в друзья
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+        @if (ViewBag.FriendList.Count() == 0)
+        {
+            <div aria-labelledby="friends-tab" class="tab-pane " id="friends" role="tabpanel">
+                <ul>
+                    Список друзей пуст
+                </ul>
+            </div>
+        }
+        else
+        {
+            @foreach (var friend in ViewBag.FriendList)
+            {
+                <div aria-labelledby="friends-tab" class="tab-pane active" id="friends" role="tabpanel">
+                    <ul>
+                        <li class="list-group-item d-flex justify-content-between align-items-start friend-item-list">
+                            <div class="ms-2 me-auto">
+                                <div class="fw-bold">@friend.NickName</div>
+                                <button onclick="deleteFriend(@friend.Id);" class="btn btn-outline-danger" type="button">
+                                    Удалить
+                                </button>
+                            </div>
+                            <a th:href="~/Home/Index?id=@friend.Id">
+                                <img class="avatarImgFriendList" src="@Url.Content(Model.User.Avatar)" />
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            }
+        }
+
+        @if (ViewBag.RequestToMe is null)
+        {
+
+
+            <div aria-labelledby="requestToMe-tab" class="tab-pane" id="requestToMe" role="tabpanel"
+                 th:unless="${!RequestToMeList.isEmpty()}">
+                <ul>
+                    Запросов в друзья отсутствуют
+                </ul>
+            </div>
+        }
+        else
+        {
+            @foreach (var friend in ViewBag.RequestToMe)
+            {
+                <div aria-labelledby="requestToMe-tab" class="tab-pane" id="requestToMe" role="tabpanel"
+                     th:each="user:${RequestToMeList}" th:if="${!RequestToMeList.isEmpty()}">
+                    <ul>
+                        <li class="list-group-item d-flex justify-content-between align-items-start friend-item-list">
+                            <div class="ms-2 me-auto">
+                                <div class="fw-bold" th:text="${user.nickName}"></div>
+                                <button class="btn btn-outline-primary"
+                                        onclick="acceptAddFriendRequest(this.getAttribute('data-id'))"
+                                        th:data-id="${user.id}" type="button">
+                                    Принять заявку
+                                </button>
+                                <button class="btn btn-outline-danger"
+                                        onclick="declineAddFriendRequest(this.getAttribute('data-id'))"
+                                        th:data-id="${user.id}" type="button">
+                                    Отклонить заявку
+                                </button>
+                            </div>
+                            <a th:href="~/Home/Index?id=@friend.Id">
+                                <img class="avatarImgFriendList" src="@Url.Content(Model.User.Avatar)" />
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            }
+        }
+
+        @if (ViewBag.RequestFromMe is null)
+        {
+
+
+            <div aria-labelledby="requestFromMe-tab" class="tab-pane" id="requestFromMe" role="tabpanel"
+                 th:unless="${!RequestFromMeList.isEmpty()}">
+                <ul>
+                    Исходящих запросов нет
+                </ul>
+            </div>
+        }
+        else
+        {
+            @foreach (var friend in ViewBag.RequestFromMe)
+            {
+                <div aria-labelledby="requestFromMe-tab" class="tab-pane" id="requestFromMe" role="tabpanel"
+                     th:each="user:${RequestFromMeList}" th:if="${!RequestFromMeList.isEmpty()}">
+                    <ul>
+                        <li class="list-group-item d-flex justify-content-between align-items-start friend-item-list"
+                            th:data-id="${user.id}">
+                            <div class="ms-2 me-auto">
+                                <div class="fw-bold" th:text="${user.nickName}"></div>
+                                <button class="btn btn-outline-primary"
+                                        onclick="cancelAddFriendRequest(this.getAttribute('data-id'))"
+                                        th:data-id="${user.id}" type="button">
+                                    Отменить заявку
+                                </button>
+                            </div>
+                            <a th:href="~/Home/Index?id=@friend.Id">
+                                <img class="avatarImgFriendList" src="@Url.Content(Model.User.Avatar)" />
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            }
+        }
+
+    </div>
+</div>
