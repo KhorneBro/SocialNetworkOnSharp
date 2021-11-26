@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace SocialNetworkOnSharp.Models
 {
+    [Table("Participant")]
     public class Participant
     {
         public int Id { get; set; }
@@ -18,9 +20,8 @@ namespace SocialNetworkOnSharp.Models
         public string MyHistory { get; set; }
         public bool UseMyHistory { get; set; }
         public bool UserAddInfo { get; set; }
+        public bool IsUserDeleted { get; set; }
         public List<Room> Rooms { get; set; } = new List<Room>();
-        public List<Friend> FriendList { get; set; } = new List<Friend>();
-        public List<Friend> FriendRequestFromMe { get; set; } = new List<Friend>();
-        public List<Friend> FriendRequestToMe { get; set; } = new List<Friend>();
+        public ICollection<Friend> FriendList { get; set; } = new List<Friend>();
     }
 }

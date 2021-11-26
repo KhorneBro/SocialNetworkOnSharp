@@ -46,7 +46,6 @@ namespace SocialNetworkOnSharp.Controllers
             {
                 pageModel.User = applicationContext.Users.FirstOrDefault(u => u.Id == id);
             }
-
             return View(pageModel);
         }
 
@@ -54,7 +53,6 @@ namespace SocialNetworkOnSharp.Controllers
         public async Task<ActionResult> AddAvatar(MainPageModel mainPageModel)
         {
             string[] permittedExtensions = { ".jpg", ".png", ".jpeg" };
-
 
             if (mainPageModel.AddAvatarpicture is null)
             {
@@ -101,19 +99,17 @@ namespace SocialNetworkOnSharp.Controllers
         }
 
         [HttpGet]
-        public ActionResult FindFriend(string nickname)
+        public async Task<ActionResult> FindFriend(string nickname)
         {
-            return View("FindFriend", userService.ParticipantsSearchFriendList(nickname, userService.FindByLogin(User.Identity.Name.ToString()).NickName));
+            return View("FindFriend", await userService.ParticipantsSearchUsersList(nickname, userService.FindByLogin(User.Identity.Name.ToString()).NickName));
         }
 
         [HttpGet]
         public ActionResult FriendList()
         {
-            Dictionary<string, List<Participant>> threeTypesFriendlist = userService.FriendList(User.Identity.Name.ToString());
-            ViewBag.FriendList = threeTypesFriendlist["FriendList"];
-            ViewBag.RequestToMe = threeTypesFriendlist["RequestToMe"];
-            ViewBag.RequestFromMe = threeTypesFriendlist["RequestFromMe"];
-            return View();
+            FriendsDictonaryModel friendsDictonaryModel = userService.FriendList(User.Identity.Name);
+
+            return View(friendsDictonaryModel);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

@@ -38,52 +38,60 @@ namespace SocialNetworkOnSharp.Controllers
         public async Task<ActionResult> MakeRequestToAddUserInAFriendList(int? id)
         {
             if (id is null)
-            {
-                return BadRequest();
-            }
+                return BadRequest("Id не может быть null");
+
 
             Participant principalUser = await userService.FindByLoginAsync(User.Identity.Name.ToString());
-            Participant friend = await applicationContext.Users.FirstOrDefaultAsync(u => u.Id == id);
-            if (principalUser == null || friend == null)
-            {
-                return NotFound();
-            }
-            if (principalUser.FriendRequestFromMe.Contains(await applicationContext.Friends.FirstOrDefaultAsync(f => f.FriendsId == friend.Id)) ||
-                friend.FriendRequestToMe.Contains(await applicationContext.Friends.FirstOrDefaultAsync(f => f.FriendsId == principalUser.Id)) ||
-                principalUser.FriendList.Contains(await applicationContext.Friends.FirstOrDefaultAsync(f => f.FriendsId == friend.Id)) ||
-                friend.FriendList.Contains(await applicationContext.Friends.FirstOrDefaultAsync(f => f.FriendsId == principalUser.Id)))
-            {
-                return BadRequest();
-            }
+            Participant friendParticipant = await applicationContext.Users.FirstOrDefaultAsync(u => u.Id == id);
 
-            principalUser.FriendRequestFromMe.Add(new Friend { FriendsId = friend.Id });
-            friend.FriendRequestToMe.Add(new Friend { FriendsId = principalUser.Id });
-            await applicationContext.SaveChangesAsync();
-            return Ok();
+            Friend friend = await applicationContext.Friends.FirstOrDefaultAsync(f => f.ParticipantId == friendParticipant.Id);
+
+            if (principalUser == null || friendParticipant == null || friendParticipant.IsUserDeleted is true)
+                return NotFound("Пользователя не существует");
+            if (friend is not null)
+            {
+                if (principalUser.FriendList.Contains(friend))
+                    return BadRequest("пользователь уже в списке");
+                else
+                {
+                    principalUser.FriendList.Add(friend);
+                    friendParticipant.FriendList.Add(new Friend { ParticipantId = principalUser.Id, FriendStatus = FriendStatus.RequestToMe, NickName = principalUser.NickName, Avatar = principalUser.Avatar });
+                    await applicationContext.SaveChangesAsync();
+                    return Ok();
+                }
+            }
+            else
+            {
+                principalUser.FriendList.Add(new Friend {  FriendStatus = FriendStatus.RequestFromMe, NickName = friendParticipant.NickName, Avatar = friendParticipant.Avatar });
+                friendParticipant.FriendList.Add(new Friend {  FriendStatus = FriendStatus.RequestToMe, NickName = principalUser.NickName, Avatar = principalUser.Avatar });
+                await applicationContext.SaveChangesAsync();
+                return Ok();
+            }
         }
 
         [HttpDelete("deleteFriend/{id}")]
         public async Task<ActionResult> DeleteFriendFromFriendList(int? id)
         {
             if (id is null)
-            {
                 return BadRequest();
-            }
+
 
             Participant principalUser = await userService.FindByLoginAsync(User.Identity.Name.ToString());
-            Participant friend = await applicationContext.Users.FirstOrDefaultAsync(u => u.Id == id);
-            if (principalUser == null || friend == null)
-            {
-                return NotFound();
-            }
-            if (!principalUser.FriendList.Contains(await applicationContext.Friends.FirstOrDefaultAsync(f => f.FriendsId == friend.Id)) ||
-               !friend.FriendList.Contains(await applicationContext.Friends.FirstOrDefaultAsync(f => f.FriendsId == principalUser.Id)))
-            {
-                return BadRequest();
-            }
+            Participant friendParticipant = await applicationContext.Users.FirstOrDefaultAsync(u => u.Id == id);
 
-            principalUser.FriendList.Remove(await applicationContext.Friends.FirstOrDefaultAsync(u => u.FriendsId == friend.Id));
-            friend.FriendList.Remove(await applicationContext.Friends.FirstOrDefaultAsync(u => u.FriendsId == principalUser.Id));
+            if (principalUser == null || friendParticipant == null)
+                return NotFound();
+
+
+            Friend friend = await applicationContext.Friends.FirstOrDefaultAsync(f => f.ParticipantId == friendParticipant.Id);
+            Friend user = await applicationContext.Friends.FirstOrDefaultAsync(f => f.ParticipantId == principalUser.Id);
+
+            if (!principalUser.FriendList.Contains(friend) || !friendParticipant.FriendList.Contains(user))
+                return BadRequest();
+
+
+            principalUser.FriendList.Remove(friend);
+            friendParticipant.FriendList.Remove(user);
             await applicationContext.SaveChangesAsync();
             return NoContent();
         }
@@ -93,24 +101,25 @@ namespace SocialNetworkOnSharp.Controllers
         public async Task<ActionResult> CancelRequestFroAddingFriend(int? id)
         {
             if (id is null)
-            {
                 return BadRequest();
-            }
+
 
             Participant principalUser = await userService.FindByLoginAsync(User.Identity.Name.ToString());
-            Participant friend = await applicationContext.Users.FirstOrDefaultAsync(u => u.Id == id);
-            if (principalUser == null || friend == null)
-            {
-                return NotFound();
-            }
-            if (!principalUser.FriendRequestFromMe.Contains(await applicationContext.Friends.FirstOrDefaultAsync(f => f.FriendsId == friend.Id)) ||
-                !friend.FriendRequestToMe.Contains(await applicationContext.Friends.FirstOrDefaultAsync(f => f.FriendsId == principalUser.Id)))
-            {
-                return BadRequest();
-            }
+            Participant friendParticipant = await applicationContext.Users.FirstOrDefaultAsync(u => u.Id == id);
 
-            principalUser.FriendRequestFromMe.Remove(await applicationContext.Friends.FirstOrDefaultAsync(u => u.FriendsId == friend.Id));
-            friend.FriendRequestToMe.Remove(await applicationContext.Friends.FirstOrDefaultAsync(u => u.FriendsId == principalUser.Id));
+            if (principalUser == null || friendParticipant == null)
+                return NotFound();
+
+
+            Friend friend = await applicationContext.Friends.FirstOrDefaultAsync(f => f.ParticipantId == friendParticipant.Id);
+            Friend user = await applicationContext.Friends.FirstOrDefaultAsync(f => f.ParticipantId == principalUser.Id);
+
+            if (!principalUser.FriendList.Contains(friend) || !friendParticipant.FriendList.Contains(user))
+                return BadRequest();
+
+
+            principalUser.FriendList.Remove(friend);
+            friendParticipant.FriendList.Remove(user);
             await applicationContext.SaveChangesAsync();
             return Ok();
         }
@@ -120,24 +129,25 @@ namespace SocialNetworkOnSharp.Controllers
         public async Task<ActionResult> DeclineRequestFroAddingFriend(int? id)
         {
             if (id is null)
-            {
                 return BadRequest();
-            }
+
 
             Participant principalUser = await userService.FindByLoginAsync(User.Identity.Name.ToString());
-            Participant friend = await applicationContext.Users.FirstOrDefaultAsync(u => u.Id == id);
-            if (principalUser == null || friend == null)
-            {
-                return NotFound();
-            }
-            if (!principalUser.FriendRequestToMe.Contains(await applicationContext.Friends.FirstOrDefaultAsync(f => f.FriendsId == friend.Id)) ||
-                !friend.FriendRequestFromMe.Contains(await applicationContext.Friends.FirstOrDefaultAsync(f => f.FriendsId == principalUser.Id)))
-            {
-                return BadRequest();
-            }
+            Participant friendParticipant = await applicationContext.Users.FirstOrDefaultAsync(u => u.Id == id);
 
-            principalUser.FriendRequestToMe.Remove(await applicationContext.Friends.FirstOrDefaultAsync(u => u.FriendsId == friend.Id));
-            friend.FriendRequestFromMe.Remove(await applicationContext.Friends.FirstOrDefaultAsync(u => u.FriendsId == principalUser.Id));
+            if (principalUser == null || friendParticipant == null)
+                return NotFound();
+
+
+            Friend friend = await applicationContext.Friends.FirstOrDefaultAsync(f => f.ParticipantId == friendParticipant.Id);
+            Friend user = await applicationContext.Friends.FirstOrDefaultAsync(f => f.ParticipantId == principalUser.Id);
+
+            if (!principalUser.FriendList.Contains(friend) || !friendParticipant.FriendList.Contains(user))
+                return BadRequest();
+
+
+            principalUser.FriendList.Remove(friend);
+            friendParticipant.FriendList.Remove(user);
             await applicationContext.SaveChangesAsync();
             return Ok();
         }
@@ -146,33 +156,29 @@ namespace SocialNetworkOnSharp.Controllers
         public async Task<ActionResult> AcceptRequestFroAddingFriend(int? id)
         {
             if (id is null)
-            {
                 return BadRequest();
-            }
 
             Participant principalUser = await userService.FindByLoginAsync(User.Identity.Name.ToString());
-            Participant friend = await applicationContext.Users.FirstOrDefaultAsync(u => u.Id == id);
-            if (principalUser == null || friend == null)
-            {
-                return NotFound();
-            }
-            if (!principalUser.FriendList.Contains(await applicationContext.Friends.FirstOrDefaultAsync(f => f.FriendsId == friend.Id)) ||
-                principalUser.FriendRequestFromMe.Contains(await applicationContext.Friends.FirstOrDefaultAsync(f => f.FriendsId == friend.Id)) ||
-                !friend.FriendList.Contains(await applicationContext.Friends.FirstOrDefaultAsync(f => f.FriendsId == principalUser.Id)) ||
-                friend.FriendRequestToMe.Contains(await applicationContext.Friends.FirstOrDefaultAsync(f => f.FriendsId == principalUser.Id)))
-            {
-                return BadRequest();
-            }
+            Participant friendParticipant = await applicationContext.Users.FirstOrDefaultAsync(u => u.Id == id);
 
-            principalUser.FriendRequestFromMe.Remove(await applicationContext.Friends.FirstOrDefaultAsync(u => u.FriendsId == friend.Id));
-            friend.FriendRequestToMe.Remove(await applicationContext.Friends.FirstOrDefaultAsync(u => u.FriendsId == principalUser.Id));
-            principalUser.FriendList.Add(new Friend { FriendsId = friend.Id });
-            friend.FriendList.Add(new Friend { FriendsId = principalUser.Id });
+            if (principalUser == null || friendParticipant == null)
+                return NotFound();
+
+            Friend friend = await applicationContext.Friends.FirstOrDefaultAsync(f => f.ParticipantId == friendParticipant.Id);
+            Friend user = await applicationContext.Friends.FirstOrDefaultAsync(f => f.ParticipantId == principalUser.Id);
+
+            if (!principalUser.FriendList.Contains(friend) || user.FriendStatus != FriendStatus.RequestFromMe ||
+                !friendParticipant.FriendList.Contains(user) || friend.FriendStatus != FriendStatus.RequestToMe)
+                return BadRequest();
+
+
+            user.FriendStatus = FriendStatus.FriendList;
+            friend.FriendStatus = FriendStatus.FriendList;
             await applicationContext.SaveChangesAsync();
             return Ok();
         }
 
-        // GET: api/<ApiActionsController>
+        // GET: api/<ApiActionsController> 
         [HttpGet("add/{id}")]
         public IEnumerable<string> Get()
         {

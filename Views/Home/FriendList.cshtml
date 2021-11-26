@@ -1,36 +1,24 @@
-﻿
+﻿@model SocialNetworkOnSharp.ViewsModel.FriendsDictonaryModel
 @{
     ViewData["Title"] = "Friends";
-    var friends = ViewBag.FriendList;
 }
 <div>
-    <ul class="nav nav-pills" role="tablist">
+    <ul class="nav nav-pills mb-3" role="tablist">
         <li class="nav-item" role="presentation">
-            <button aria-controls="friends" aria-selected="true" class="nav-link active" data-bs-target="#friends"
-                    data-bs-toggle="tab" id="friends-tab" role="tab" type="button">
-                Друзья
-            </button>
+            <a class="nav-link active" id="friends-tab" data-toggle="tab" href="#friends" role="tab" aria-controls="friends">Друзья</a>
         </li>
         <li class="nav-item" role="presentation">
-            <button aria-controls="requestToMe" aria-selected="false" class="nav-link "
-                    data-bs-target="#requestToMe"
-                    data-bs-toggle="tab" id="requestToMe-tab" role="tab" type="button">
-                Входящие запросы в друзья
-            </button>
+            <a class="nav-link" id="requestToMe-tab" data-toggle="tab" href="#requestToMe" role="tab" aria-controls="requestToMe">Входящие запросы в друзья</a>
         </li>
         <li class="nav-item" role="presentation">
-            <button aria-controls="requestFromMe" aria-selected="false" class="nav-link "
-                    data-bs-target="#requestFromMe"
-                    data-bs-toggle="tab" id="requestFromMe-tab" role="tab" type="button">
-                Исходящие запросы в друзья
-            </button>
+            <a class="nav-link" id="requestFromMe-tab" data-toggle="tab" href="#requestFromMe" role="tab" aria-controls="requestFromMe">Исходящие запросы в друзья</a>
         </li>
     </ul>
 
     <div class="tab-content">
-        @if (ViewBag.FriendList.Count() == 0)
+        @if (!@Model.Friends.Any())
         {
-            <div aria-labelledby="friends-tab" class="tab-pane " id="friends" role="tabpanel">
+            <div class="tab-pane active" id="friends" role="tabpanel" aria-labelledby="friends-tab">
                 <ul>
                     Список друзей пуст
                 </ul>
@@ -38,9 +26,9 @@
         }
         else
         {
-            @foreach (var friend in ViewBag.FriendList)
+            @foreach (var friend in @Model.Friends)
             {
-                <div aria-labelledby="friends-tab" class="tab-pane active" id="friends" role="tabpanel">
+                <div class="tab-pane active" id="friends" role="tabpanel" aria-labelledby="friends-tab">
                     <ul>
                         <li class="list-group-item d-flex justify-content-between align-items-start friend-item-list">
                             <div class="ms-2 me-auto">
@@ -49,8 +37,8 @@
                                     Удалить
                                 </button>
                             </div>
-                            <a th:href="~/Home/Index?id=@friend.Id">
-                                <img class="avatarImgFriendList" src="@Url.Content(Model.User.Avatar)" />
+                            <a href="~/Home/Index?id=@friend.Id">
+                                <img class="avatarImgFriendList" src="@Url.Content(@friend.Avatar)" />
                             </a>
                         </li>
                     </ul>
@@ -58,12 +46,9 @@
             }
         }
 
-        @if (ViewBag.RequestToMe is null)
+        @if (!@Model.FriendsRequestToMe.Any())
         {
-
-
-            <div aria-labelledby="requestToMe-tab" class="tab-pane" id="requestToMe" role="tabpanel"
-                 th:unless="${!RequestToMeList.isEmpty()}">
+            <div class="tab-pane " id="requestToMe" role="tabpanel" aria-labelledby="requestToMe-tab">
                 <ul>
                     Запросов в друзья отсутствуют
                 </ul>
@@ -71,27 +56,22 @@
         }
         else
         {
-            @foreach (var friend in ViewBag.RequestToMe)
+            @foreach (var friend in @Model.FriendsRequestToMe)
             {
-                <div aria-labelledby="requestToMe-tab" class="tab-pane" id="requestToMe" role="tabpanel"
-                     th:each="user:${RequestToMeList}" th:if="${!RequestToMeList.isEmpty()}">
+                <div class="tab-pane " id="requestToMe" role="tabpanel" aria-labelledby="requestToMe-tab">
                     <ul>
                         <li class="list-group-item d-flex justify-content-between align-items-start friend-item-list">
                             <div class="ms-2 me-auto">
-                                <div class="fw-bold" th:text="${user.nickName}"></div>
-                                <button class="btn btn-outline-primary"
-                                        onclick="acceptAddFriendRequest(this.getAttribute('data-id'))"
-                                        th:data-id="${user.id}" type="button">
+                                <div class="fw-bold">@friend.NickName</div>
+                                <button class="btn btn-outline-primary" onclick="acceptAddFriendRequest(@friend.Id)" type="button">
                                     Принять заявку
                                 </button>
-                                <button class="btn btn-outline-danger"
-                                        onclick="declineAddFriendRequest(this.getAttribute('data-id'))"
-                                        th:data-id="${user.id}" type="button">
+                                <button class="btn btn-outline-danger" onclick="declineAddFriendRequest(@friend.Id)" type="button">
                                     Отклонить заявку
                                 </button>
                             </div>
-                            <a th:href="~/Home/Index?id=@friend.Id">
-                                <img class="avatarImgFriendList" src="@Url.Content(Model.User.Avatar)" />
+                            <a href="~/Home/Index?id=@friend.Id">
+                                <img class="avatarImgFriendList" src="@Url.Content(@friend.Avatar)" />
                             </a>
                         </li>
                     </ul>
@@ -99,12 +79,9 @@
             }
         }
 
-        @if (ViewBag.RequestFromMe is null)
+        @if (!@Model.FriendsRequestFromMe.Any())
         {
-
-
-            <div aria-labelledby="requestFromMe-tab" class="tab-pane" id="requestFromMe" role="tabpanel"
-                 th:unless="${!RequestFromMeList.isEmpty()}">
+            <div class="tab-pane " id="requestFromMe" role="tabpanel" aria-labelledby="requestFromMe-tab">
                 <ul>
                     Исходящих запросов нет
                 </ul>
@@ -112,23 +89,19 @@
         }
         else
         {
-            @foreach (var friend in ViewBag.RequestFromMe)
+            @foreach (var friend in @Model.FriendsRequestFromMe)
             {
-                <div aria-labelledby="requestFromMe-tab" class="tab-pane" id="requestFromMe" role="tabpanel"
-                     th:each="user:${RequestFromMeList}" th:if="${!RequestFromMeList.isEmpty()}">
+                <div class="tab-pane " id="requestFromMe" role="tabpanel" aria-labelledby="requestFromMe-tab">
                     <ul>
-                        <li class="list-group-item d-flex justify-content-between align-items-start friend-item-list"
-                            th:data-id="${user.id}">
+                        <li class="list-group-item d-flex justify-content-between align-items-start friend-item-list">
                             <div class="ms-2 me-auto">
-                                <div class="fw-bold" th:text="${user.nickName}"></div>
-                                <button class="btn btn-outline-primary"
-                                        onclick="cancelAddFriendRequest(this.getAttribute('data-id'))"
-                                        th:data-id="${user.id}" type="button">
+                                <div class="fw-bold">@friend.NickName</div>
+                                <button class="btn btn-outline-primary" onclick="cancelAddFriendRequest(@friend.Id)" type="button">
                                     Отменить заявку
                                 </button>
                             </div>
-                            <a th:href="~/Home/Index?id=@friend.Id">
-                                <img class="avatarImgFriendList" src="@Url.Content(Model.User.Avatar)" />
+                            <a href="~/Home/Index?id=@friend.Id">
+                                <img class="avatarImgFriendList" src="@Url.Content(@friend.Avatar)" />
                             </a>
                         </li>
                     </ul>
