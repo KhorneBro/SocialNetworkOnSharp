@@ -12,7 +12,7 @@ namespace SocialNetworkOnSharp.Controllers
 {
     public class AccountController : Controller
     {
-        private ApplicationContext applicationContext;
+        private readonly ApplicationContext applicationContext;
 
         public AccountController(ApplicationContext applicationContext)
         {

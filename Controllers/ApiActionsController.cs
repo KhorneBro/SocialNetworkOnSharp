@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SocialNetworkOnSharp.Models;
 using SocialNetworkOnSharp.Services;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -62,8 +62,8 @@ namespace SocialNetworkOnSharp.Controllers
             }
             else
             {
-                principalUser.FriendList.Add(new Friend {  FriendStatus = FriendStatus.RequestFromMe, NickName = friendParticipant.NickName, Avatar = friendParticipant.Avatar });
-                friendParticipant.FriendList.Add(new Friend {  FriendStatus = FriendStatus.RequestToMe, NickName = principalUser.NickName, Avatar = principalUser.Avatar });
+                principalUser.FriendList.Add(new Friend { FriendStatus = FriendStatus.RequestFromMe, NickName = friendParticipant.NickName, Avatar = friendParticipant.Avatar });
+                friendParticipant.FriendList.Add(new Friend { FriendStatus = FriendStatus.RequestToMe, NickName = principalUser.NickName, Avatar = principalUser.Avatar });
                 await applicationContext.SaveChangesAsync();
                 return Ok();
             }
